@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>TechShop - Carretó</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Carretó</h1>
+    <a href="{{ url_for('routes.show_products') }}">Tornar a Productes</a>
+    <hr>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, msg in messages %}
+            <li class="{{ category }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if cart %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Producte</th>
+                <th>Quantitat</th>
+                <th>Subtotal</th>
+                <th>Acció</th>
+            </tr>
+            {% for item in cart %}
+            <tr>
+                <td>{{ item['product'].name }}</td>
+                <td>{{ item['quantity'] }}</td>
+                <td>{{ "%.2f"|format(item['subtotal']) }} €</td>
+                <td>
+                    <a href="{{ url_for('routes.remove_from_cart', product_id=item['product'].id) }}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>Total: {{ "%.2f"|format(total) }} €</h3>
+        <a href="{{ url_for('routes.checkout') }}">Finalitzar Compra</a>
+    {% else %}
+        <p>El carretó està buit.</p>
+    {% endif %}
+</body>
+</html>

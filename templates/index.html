@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>TechShop - Productes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>TechShop - Productes</h1>
+    <a href="{{ url_for('routes.show_cart') }}">Veure Carretó</a>
+    <hr>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, msg in messages %}
+            <li class="{{ category }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    
+    <ul>
+    {% for product in products %}
+        <li>
+            <strong>{{ product.name }}</strong> - {{ "%.2f"|format(product.price) }} € - Stock: {{ product.stock }}
+            <form action="{{ url_for('routes.add_to_cart', product_id=product.id) }}" method="POST" style="display:inline;">
+                <input type="number" name="quantity" value="1" min="1" max="5" required>
+                <button type="submit">Afegir al carretó</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

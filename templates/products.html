@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>🛒 TechShop - Llista de Productes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+    <header>
+        <h1>🛒 TechShop</h1>
+        <p>Llista de Productes</p>
+    </header>
+
+    <main class="products-container">
+        {% for product in products %}
+            <div class="product-card">
+                <h2>{{ product.name }}</h2>
+                <p>Preu: {{ product.price }}€</p>
+                <p>{{ product.description or "Sense descripció" }}</p>
+                <button>Afegir al carret</button>
+            </div>
+        {% endfor %}
+    </main>
+
+    <footer>
+        <p>© 2025 TechShop</p>
+    </footer>
+</body>
+</html>
