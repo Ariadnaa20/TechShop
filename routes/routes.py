@@ -13,14 +13,13 @@ def home():
 
 
 # 🧾 CHECKOUT → Formulari inicial amb validacions
-
 @bp.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         email = request.form.get('email')
-        address = request.form.get('address')  # pots deixar-ho encara que no s’emmagatzemi
+        address = request.form.get('address')  # per ara no s'emmagatzema
 
         if not username or not password or not email:
             flash("Tots els camps són obligatoris ⚠️", "error")
@@ -34,11 +33,7 @@ def checkout():
         else:
             # 🔹 Crear nou usuari amb contrasenya xifrada
             hashed_password = generate_password_hash(password)
-            new_user = User(
-                username=username,
-                password_hash=hashed_password,
-                email=email
-            )
+            new_user = User(username=username, password_hash=hashed_password, email=email)
             db.session.add(new_user)
             db.session.commit()
             session['user_id'] = new_user.id
@@ -47,8 +42,6 @@ def checkout():
         return redirect(url_for('routes.show_products'))
 
     return render_template('checkout.html')
-
-
 
 
 # 🛒 MOSTRAR PRODUCTES
@@ -69,7 +62,10 @@ def show_cart():
     cart = session.get('cart', {})
     cart_items = []
     total = 0
-    for product_id, quantity in cart.items():
+
+    # 🔹 Convertim claus de string a int per buscar productes correctament
+    for product_id_str, quantity in cart.items():
+        product_id = int(product_id_str)
         product = Product.query.get(product_id)
         if product:
             subtotal = float(product.price) * quantity
@@ -94,44 +90,46 @@ def finish_checkout():
         flash("El carretó està buit 🛒", 'error')
         return redirect(url_for('routes.show_products'))
 
+    print("🧩 Dades de sessió actual:", session)
+    print("🛍️ Carret actual:", cart)
+
     user_id = session['user_id']
     total = 0
     order_items = []
 
-    # 🔹 Calcular total i preparar línies de comanda
-    for product_id, quantity in cart.items():
+    # 🔹 Calcular total i preparar items
+    for product_id_str, quantity in cart.items():
+        product_id = int(product_id_str)
         product = Product.query.get(product_id)
         if product:
             subtotal = float(product.price) * quantity
             total += subtotal
             order_items.append((product, quantity, subtotal))
 
-    # 🔹 Crear comanda
-    new_order = Order(user_id=user_id, date=datetime.now(), total=total)
+    # 🔹 Crear ordre
+    new_order = Order(user_id=user_id, total=total, created_at=datetime.now())
     db.session.add(new_order)
-    db.session.commit()  # Guardem per obtenir ID
+    db.session.commit()  # necessari per obtenir ID
 
-    # 🔹 Crear cada línia (OrderItem)
+    # 🔹 Crear línies de comanda
     for product, quantity, subtotal in order_items:
         order_item = OrderItem(
             order_id=new_order.id,
             product_id=product.id,
-            quantity=quantity,
-            price=product.price
+            quantity=quantity
         )
         db.session.add(order_item)
-
-        # Reduir stock
         product.stock -= quantity
 
     db.session.commit()
 
     # 🔹 Netejar carretó
     session['cart'] = {}
-    flash("Compra finalitzada correctament! ✅", 'success')
+    session.modified = True
 
+    flash("Compra finalitzada correctament! ✅", 'success')
     return render_template('order_succes.html', total=total)
-    
+
 
 # ➕ AFEGIR PRODUCTE AL CARRETÓ
 @bp.route('/add_to_cart/<int:product_id>/<int:quantity>', methods=['GET', 'POST'])
@@ -139,10 +137,14 @@ def add_to_cart(product_id, quantity):
     product = Product.query.get_or_404(product_id)
     cart = session.get('cart', {})
 
+    # 🔹 Convertim la clau a string per evitar errors de serialització
+    product_key = str(product_id)
+
     try:
         CartService.validate_stock(product, quantity)
-        CartService.add_to_cart(cart, product, quantity)
+        cart[product_key] = cart.get(product_key, 0) + quantity
         session['cart'] = cart
+        session.modified = True
         flash(f"S'han afegit {quantity} unitats de {product.name} al carretó ✅", 'success')
     except ValueError as e:
         flash(str(e), 'error')
@@ -154,7 +156,10 @@ def add_to_cart(product_id, quantity):
 @bp.route('/remove_from_cart/<int:product_id>')
 def remove_from_cart(product_id):
     cart = session.get('cart', {})
-    CartService.remove_from_cart(cart, product_id)
+    product_key = str(product_id)
+    if product_key in cart:
+        del cart[product_key]
     session['cart'] = cart
+    session.modified = True
     flash("Producte eliminat del carretó 🗑️", 'success')
     return redirect(url_for('routes.show_cart'))
