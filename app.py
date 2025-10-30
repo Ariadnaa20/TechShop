@@ -1,7 +1,8 @@
 import os
 from flask import Flask
-from models.models import db
+from models import db
 from routes.routes import bp
+
 
 def create_app():
     app = Flask(__name__)

@@ -2,47 +2,60 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>TechShop - Carretó</title>
+    <title>TechShop - Carretó de Compra</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Carretó</h1>
-    <a href="{{ url_for('routes.show_products') }}">Tornar a Productes</a>
-    <hr>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, msg in messages %}
-            <li class="{{ category }}">{{ msg }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+<header>
+    <h1>🛒 Carretó de Compra</h1>
+    <nav>
+        <a href="{{ url_for('routes.show_products') }}" class="btn-cart">⬅️ Tornar a Productes</a>
+    </nav>
+</header>
 
+<main class="cart-container">
     {% if cart %}
-        <table border="1" cellpadding="5">
-            <tr>
-                <th>Producte</th>
-                <th>Quantitat</th>
-                <th>Subtotal</th>
-                <th>Acció</th>
-            </tr>
-            {% for item in cart %}
-            <tr>
-                <td>{{ item['product'].name }}</td>
-                <td>{{ item['quantity'] }}</td>
-                <td>{{ "%.2f"|format(item['subtotal']) }} €</td>
-                <td>
-                    <a href="{{ url_for('routes.remove_from_cart', product_id=item['product'].id) }}">Eliminar</a>
-                </td>
-            </tr>
-            {% endfor %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Producte</th>
+                    <th>Quantitat</th>
+                    <th>Subtotal</th>
+                    <th>Acció</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ "%.2f"|format(item.subtotal) }} €</td>
+                    <td>
+                        <a href="{{ url_for('routes.remove_from_cart', product_id=item.product.id) }}" class="btn-remove">
+                            🗑️ Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-        <h3>Total: {{ "%.2f"|format(total) }} €</h3>
-        <a href="{{ url_for('routes.checkout') }}">Finalitzar Compra</a>
+
+        <div class="cart-summary">
+            <p><strong>Total:</strong> {{ "%.2f"|format(total) }} €</p>
+            <a href="{{ url_for('routes.checkout') }}" class="btn-checkout">💳 Finalitzar Compra</a>
+        </div>
     {% else %}
-        <p>El carretó està buit.</p>
+        <div class="empty-cart">
+            <p>El teu carretó està buit 😢</p>
+            <a href="{{ url_for('routes.show_products') }}" class="btn-add">Tornar a comprar</a>
+        </div>
     {% endif %}
+</main>
+
+<footer>
+    <p>© 2025 TechShop · Desenvolupat per Ariadna Pasqual</p>
+</footer>
+
 </body>
 </html>

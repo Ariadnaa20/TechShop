@@ -2,26 +2,74 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Checkout</title>
+    <title>TechShop - Checkout</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
 <body>
-    <h1>Formulari de Checkout</h1>
-    <form action="{{ url_for('process_checkout') }}" method="POST">
-        <label for="username">Nom d'usuari:</label>
-        <input type="text" id="username" name="username" minlength="4" maxlength="20" required>
 
-        <label for="password">Contrasenya:</label>
-        <input type="password" id="password" name="password" minlength="8" required>
+<header class="header-checkout">
+    <h1>🧾 Formulari de Checkout</h1>
+    <p class="subtitle">Introdueix les teves dades per continuar la compra</p>
+</header>
 
-        <label for="email">Correu electrònic:</label>
-        <input type="email" id="email" name="email" required>
+<main class="checkout-container">
 
-        <label for="address">Adreça d'enviament:</label>
-        <input type="text" id="address" name="address" required>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for category, msg in messages %}
+            <li class="{{ category }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
 
-        <button type="submit">Finalitzar compra</button>
+    <form id="checkoutForm" action="{{ url_for('routes.checkout') }}" method="POST" class="checkout-form" novalidate>
+        
+        <div class="form-group">
+            <label for="username">👤 Nom d'usuari:</label>
+            <input type="text" id="username" name="username"
+                   minlength="4" maxlength="20"
+                   pattern="[A-Za-z0-9_]{4,20}"
+                   placeholder="Ex: maria_123"
+                   required>
+            <small class="error-msg"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="password">🔒 Contrasenya:</label>
+            <input type="password" id="password" name="password"
+                   minlength="8"
+                   placeholder="Introdueix la teva contrasenya"
+                   required>
+            <small class="error-msg"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="email">📧 Correu electrònic:</label>
+            <input type="email" id="email" name="email"
+                   placeholder="exemple@correu.com"
+                   required>
+            <small class="error-msg"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="address">🏠 Adreça d'enviament:</label>
+            <input type="text" id="address" name="address"
+                   minlength="5" maxlength="100"
+                   placeholder="Ex: Carrer de la Pau, 23, Barcelona"
+                   required>
+            <small class="error-msg"></small>
+        </div>
+
+        <button type="submit" class="btn-checkout">✨ Continuar a la botiga</button>
     </form>
+</main>
+
+<footer>
+    <p>© 2025 TechShop · Desenvolupat per Ariadna Pasqual</p>
+</footer>
+
 </body>
 </html>

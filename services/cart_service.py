@@ -1,4 +1,5 @@
-from models.models import Product
+from models import Product
+
 
 class CartService:
     MAX_QUANTITY_PER_PRODUCT = 5

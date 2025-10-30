@@ -2,29 +2,50 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>🛒 TechShop - Llista de Productes</title>
+    <title>TechShop - Productes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
 </head>
 <body>
-    <header>
-        <h1>🛒 TechShop</h1>
-        <p>Llista de Productes</p>
-    </header>
 
-    <main class="products-container">
+<header>
+    <h1>🛒 TechShop - Llista de Productes</h1>
+    <nav>
+        <a href="{{ url_for('routes.show_cart') }}" class="btn-cart">Veure Carretó</a>
+    </nav>
+</header>
+
+<main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="messages">
+          {% for category, msg in messages %}
+            <p class="message {{ category }}">{{ msg }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="products-container">
         {% for product in products %}
-            <div class="product-card">
-                <h2>{{ product.name }}</h2>
-                <p>Preu: {{ product.price }}€</p>
-                <p>{{ product.description or "Sense descripció" }}</p>
-                <button>Afegir al carret</button>
-            </div>
-        {% endfor %}
-    </main>
+        <div class="product-card">
+            <h2>{{ product.name }}</h2>
+            <p class="price">{{ "%.2f"|format(product.price) }} €</p>
+            <p class="stock">Stock disponible: {{ product.stock }}</p>
 
-    <footer>
-        <p>© 2025 TechShop</p>
-    </footer>
+            <form action="{{ url_for('routes.add_to_cart', product_id=product.id, quantity=1) }}" method="GET">
+                <label for="quantity_{{ product.id }}">Quantitat:</label>
+                <input type="number" id="quantity_{{ product.id }}" name="quantity"
+                       value="1" min="1" max="5" required>
+                <button type="submit" class="btn-add">Afegir al carretó</button>
+            </form>
+        </div>
+        {% endfor %}
+    </section>
+</main>
+
+<footer>
+    <p>© 2025 TechShop · Desenvolupat per Ariadna Pascual</p>
+</footer>
+
 </body>
 </html>

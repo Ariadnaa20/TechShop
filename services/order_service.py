@@ -1,7 +1,7 @@
 """
 Lògica de negoci relacionada amb les comandes.
 """
-from models.models import db, Order, OrderItem, Product
+from models import db, Order, OrderItem, Product
 
 class OrderService:
 
