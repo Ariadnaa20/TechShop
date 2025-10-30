@@ -195,4 +195,4 @@ S’ha utilitzat **ChatGPT (OpenAI GPT-5)** per:
 
 Aquest projecte es distribueix sota llicència **MIT** per a ús educatiu.
 
-© 2025 TechShop – Desenvolupat per **Ariadna Pasqual** 🩵
+© 2025 TechShop – Desenvolupat per **Ariadna Pascual i Hugo Torres** 🩵
